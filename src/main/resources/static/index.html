@@ -1,0 +1,592 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribely | Subscription Billing</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #20243a;
+        }
+
+        header {
+            background: #202b52;
+            color: white;
+            padding: 24px 6%;
+        }
+
+        header h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        header p {
+            color: #d5dcf7;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 28px auto;
+            padding: 0 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat, .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px #202b520d;
+        }
+
+        .stat p {
+            color: #68718a;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .stat h2 {
+            font-size: 28px;
+            color: #354cc9;
+        }
+
+        .panel {
+            margin-bottom: 24px;
+        }
+
+        .panel h2 {
+            font-size: 20px;
+            margin-bottom: 18px;
+        }
+
+        .forms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 12px 0 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d9deeb;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 15px;
+            background: #354cc9;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 14px;
+        }
+
+        button:hover {
+            background: #263aa8;
+        }
+
+        .secondary {
+            background: #e9edff;
+            color: #263aa8;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 520px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px 10px;
+            border-bottom: 1px solid #edf0f6;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f7f8fc;
+            color: #68718a;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #fff1d5;
+            color: #8a5b00;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 12px;
+            border-radius: 7px;
+            display: none;
+        }
+
+        .success {
+            display: block;
+            background: #e2f8eb;
+            color: #176638;
+        }
+
+        .error {
+            display: block;
+            background: #ffebeb;
+            color: #a32222;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #68718a;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 22px;
+            }
+
+            main {
+                padding: 0 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Subscribely</h1>
+    <p>Subscription Billing Management System</p>
+</header>
+
+<main>
+    <div id="message" class="message"></div>
+
+    <section class="stats">
+        <div class="stat">
+            <p>Total Customers</p>
+            <h2 id="customerCount">0</h2>
+        </div>
+        <div class="stat">
+            <p>Available Plans</p>
+            <h2 id="planCount">0</h2>
+        </div>
+        <div class="stat">
+            <p>Total Subscriptions</p>
+            <h2 id="subscriptionCount">0</h2>
+        </div>
+        <div class="stat">
+            <p>Billing Records</p>
+            <h2 id="billingCount">0</h2>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Manage Customers</h2>
+        <form id="customerForm" class="forms">
+            <div>
+                <label for="customerName">Full Name</label>
+                <input id="customerName" required maxlength="100"
+                       placeholder="Enter customer name">
+            </div>
+            <div>
+                <label for="customerEmail">Email</label>
+                <input id="customerEmail" type="email" required
+                       placeholder="Enter email address">
+            </div>
+            <div>
+                <label for="customerPhone">Phone</label>
+                <input id="customerPhone"
+                       placeholder="Enter phone number">
+                <button type="submit">Add Customer</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Create Subscription Plan</h2>
+        <form id="planForm" class="forms">
+            <div>
+                <label for="planName">Plan Name</label>
+                <input id="planName" required maxlength="100"
+                       placeholder="e.g. Premium Plan">
+            </div>
+            <div>
+                <label for="planPrice">Price (₹)</label>
+                <input id="planPrice" type="number" min="0.01"
+                       step="0.01" required placeholder="499">
+            </div>
+            <div>
+                <label for="billingCycle">Billing Cycle</label>
+                <select id="billingCycle">
+                    <option value="MONTHLY">Monthly</option>
+                    <option value="YEARLY">Yearly</option>
+                </select>
+                <button type="submit">Create Plan</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Subscribe a Customer</h2>
+        <form id="subscriptionForm" class="forms">
+            <div>
+                <label for="customerSelect">Select Customer</label>
+                <select id="customerSelect" required>
+                    <option value="">Select a customer</option>
+                </select>
+            </div>
+            <div>
+                <label for="planSelect">Select Plan</label>
+                <select id="planSelect" required>
+                    <option value="">Select a plan</option>
+                </select>
+                <button type="submit">Create Subscription</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Customers</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+                </thead>
+                <tbody id="customerTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Subscription Plans</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Plan</th>
+                    <th>Price</th>
+                    <th>Billing Cycle</th>
+                </tr>
+                </thead>
+                <tbody id="planTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Subscriptions</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Plan</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody id="subscriptionTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Billing and Invoices</h2>
+        <button type="button" class="secondary"
+                onclick="loadData()">Refresh Data</button>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Invoice</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Billing Date</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="billingTable"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer>
+    Subscribely · Subscription Billing Management System
+</footer>
+
+<script>
+    const $ = id => document.getElementById(id);
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...options.headers
+            }
+        });
+
+        const text = await response.text();
+        let data = null;
+
+        try {
+            data = text ? JSON.parse(text) : null;
+        } catch {
+            data = text;
+        }
+
+        if (!response.ok) {
+            const details = data && typeof data === "object"
+                ? Object.values(data).join(", ")
+                : text;
+
+            throw new Error(details || `HTTP ${response.status}`);
+        }
+
+        return data;
+    }
+
+    function showMessage(message, isError = false) {
+        const box = $("message");
+        box.textContent = message;
+        box.className = "message " + (isError ? "error" : "success");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        setTimeout(() => {
+            box.className = "message";
+        }, 5000);
+    }
+
+    function cell(value) {
+        const td = document.createElement("td");
+        td.textContent = value ?? "-";
+        return td;
+    }
+
+    function addRow(tableId, values) {
+        const row = document.createElement("tr");
+        values.forEach(value => row.appendChild(cell(value)));
+        $(tableId).appendChild(row);
+        return row;
+    }
+
+    async function loadData() {
+        try {
+            const [customers, plans, subscriptions, bills] =
+                await Promise.all([
+                    api("/api/customers"),
+                    api("/api/plans"),
+                    api("/api/subscriptions"),
+                    api("/api/billing")
+                ]);
+
+            $("customerCount").textContent = customers.length;
+            $("planCount").textContent = plans.length;
+            $("subscriptionCount").textContent = subscriptions.length;
+            $("billingCount").textContent = bills.length;
+
+            ["customerTable", "planTable",
+                "subscriptionTable", "billingTable"].forEach(id => {
+                $(id).replaceChildren();
+            });
+
+            $("customerSelect").replaceChildren(
+                new Option("Select a customer", "")
+            );
+
+            $("planSelect").replaceChildren(
+                new Option("Select a plan", "")
+            );
+
+            customers.forEach(c => {
+                addRow("customerTable", [
+                    c.id, c.name, c.email, c.phone
+                ]);
+
+                $("customerSelect").add(
+                    new Option(`${c.name} (ID: ${c.id})`, c.id)
+                );
+            });
+
+            plans.forEach(p => {
+                addRow("planTable", [
+                    p.id, p.name, "₹" + p.price, p.billingCycle
+                ]);
+
+                $("planSelect").add(
+                    new Option(
+                        `${p.name} - ₹${p.price} (${p.billingCycle})`,
+                        p.id
+                    )
+                );
+            });
+
+            subscriptions.forEach(s => {
+                addRow("subscriptionTable", [
+                    s.id,
+                    s.customer?.name,
+                    s.plan?.name,
+                    s.startDate,
+                    s.endDate,
+                    s.status
+                ]);
+            });
+
+            bills.forEach(b => {
+                const row = addRow("billingTable", [
+                    b.invoiceNumber,
+                    b.subscription?.customer?.name,
+                    "₹" + b.amount,
+                    b.billingDate,
+                    b.paymentStatus
+                ]);
+
+                const actionCell = document.createElement("td");
+
+                if (b.paymentStatus === "PENDING") {
+                    const button = document.createElement("button");
+                    button.textContent = "Mark Paid";
+
+                    button.addEventListener("click", async () => {
+                        try {
+                            await api(`/api/billing/${b.id}/pay`, {
+                                method: "PUT"
+                            });
+                            showMessage("Invoice marked as paid.");
+                            await loadData();
+                        } catch (error) {
+                            showMessage(error.message, true);
+                        }
+                    });
+
+                    actionCell.appendChild(button);
+                } else {
+                    actionCell.textContent = "Completed";
+                }
+
+                row.appendChild(actionCell);
+            });
+
+        } catch (error) {
+            showMessage(
+                "Could not load data. Make sure Spring Boot is running. "
+                + error.message,
+                true
+            );
+        }
+    }
+
+    $("customerForm").addEventListener("submit", async event => {
+        event.preventDefault();
+
+        try {
+            await api("/api/customers", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: $("customerName").value.trim(),
+                    email: $("customerEmail").value.trim(),
+                    phone: $("customerPhone").value.trim()
+                })
+            });
+
+            event.target.reset();
+            showMessage("Customer added successfully.");
+            await loadData();
+        } catch (error) {
+            showMessage(error.message, true);
+        }
+    });
+
+    $("planForm").addEventListener("submit", async event => {
+        event.preventDefault();
+
+        try {
+            await api("/api/plans", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: $("planName").value.trim(),
+                    price: Number($("planPrice").value),
+                    billingCycle: $("billingCycle").value
+                })
+            });
+
+            event.target.reset();
+            showMessage("Subscription plan created successfully.");
+            await loadData();
+        } catch (error) {
+            showMessage(error.message, true);
+        }
+    });
+
+    $("subscriptionForm").addEventListener("submit", async event => {
+        event.preventDefault();
+
+        try {
+            await api("/api/subscriptions", {
+                method: "POST",
+                body: JSON.stringify({
+                    customerId: Number($("customerSelect").value),
+                    planId: Number($("planSelect").value)
+                })
+            });
+
+            event.target.reset();
+            showMessage(
+                "Subscription created and initial invoice generated."
+            );
+            await loadData();
+        } catch (error) {
+            showMessage(error.message, true);
+        }
+    });
+
+    loadData();
+</script>
+
+</body>
+</html>
